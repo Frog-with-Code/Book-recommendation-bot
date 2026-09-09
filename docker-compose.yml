@@ -1,0 +1,16 @@
+services:
+  neo4j:
+    image: neo4j:5-community
+    container_name: neo4j_book_bot
+    restart: unless-stopped
+    ports:
+      - "7474:7474" # HTTP interface (Neo4j Browser)
+      - "7687:7687" # Bolt protocol (for Python connection)
+    environment:
+      - NEO4J_AUTH=neo4j/12345678
+      - NEO4J_server_memory_pagecache_size=512M
+      - NEO4J_server_memory_heap_initial__size=512M
+      - NEO4J_server_memory_heap_max__size=1G
+    volumes:
+      - ./neo4j_data:/data
+      - ./neo4j_logs:/logs

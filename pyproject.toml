@@ -1,0 +1,15 @@
+[project]
+name = "book-recommendation-bot"
+version = "0.1.0"
+description = "Bot for advanced book recommendation"
+readme = "README.md"
+authors = [{ name = "Frog-with-Code", email = "frogwithcode@gmail.com" }]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+lab-3 = "lab_3:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
