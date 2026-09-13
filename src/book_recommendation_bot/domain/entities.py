@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Book:
-    id: str
+    id: int
     title: str
     authors: list[str]
     genres: list[str]
@@ -13,7 +13,7 @@ class Book:
 
 @dataclass
 class BookScore:
-    book_id: str
+    book_id: int
     vector_score: float
     author_score: float
     onboarding_genre_score: float
