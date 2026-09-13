@@ -5,10 +5,15 @@ description = "Bot for advanced book recommendation"
 readme = "README.md"
 authors = [{ name = "Frog-with-Code", email = "frogwithcode@gmail.com" }]
 requires-python = ">=3.13"
-dependencies = []
-
-[project.scripts]
-lab-3 = "lab_3:main"
+dependencies = [
+    "aiogram>=3.31.0",
+    "einops>=0.8.2",
+    "neo4j>=6.3.0",
+    "pandas>=3.0.5",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "sentence-transformers>=6.0.1",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.9,<0.13.0"]

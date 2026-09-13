@@ -12,3 +12,6 @@ wheels/
 neo4j_*
 
 .env
+data/
+
+.vscode/
