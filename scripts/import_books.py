@@ -1,20 +1,8 @@
-"""Script for importing data into Neo4j
-
-Input:
-    - File in CSV format (data/books.csv). Required columns (no register specific):
-        - id (int)
-        - title (str)
-        - description (str)
-        - authors (str)
-        - genres (str)
-        - embedding (str)
-    - Model for sentence embedding
-"""
-
+import ast
 import pandas as pd
 from neo4j import GraphDatabase
 
-from book_recommendation_bot.config import config
+from book_recommendation_bot.config import EMBEDDING_SERVICE_MODEL, config
 from book_recommendation_bot.domain.consts import (
     UNKNOWN_AUTHOR,
     UNKNOWN_GENRE,
@@ -22,7 +10,32 @@ from book_recommendation_bot.domain.consts import (
 )
 from book_recommendation_bot.infrastructure.embeddings import EmbeddingService
 
-embedding_service = EmbeddingService("BAAI/bge-base-en-v1.5")
+
+def parse_list_field(val, default_val: str) -> list[str]:
+    if pd.isna(val):
+        return [default_val]
+
+    raw = str(val).strip()
+    if not raw or raw == "nan":
+        return [default_val]
+
+    if raw.startswith("[") and raw.endswith("]"):
+        try:
+            parsed = ast.literal_eval(raw)
+            if isinstance(parsed, list):
+                clean = [
+                    str(x).strip(" '\"[]") for x in parsed if str(x).strip(" '\"[]")
+                ]
+                return clean if clean else [default_val]
+        except (ValueError, SyntaxError):
+            pass
+
+    raw_cleaned = raw.strip("[]")
+    items = [x.strip(" '\"") for x in raw_cleaned.split(",") if x.strip(" '\"")]
+    return items if items else [default_val]
+
+
+embedding_service = EmbeddingService(EMBEDDING_SERVICE_MODEL)
 
 df = pd.read_csv("data/books.csv").dropna(subset=["description"])
 descriptions = df["description"].tolist()
@@ -32,15 +45,11 @@ embeddings = embedding_service.embed_documents(descriptions, batch_size=32)
 books_batch = []
 
 for i, (_, row) in enumerate(df.iterrows()):
-    raw_authors = str(row.get("authors", ""))
-    authors = [a.strip() for a in raw_authors.split(",") if a.strip()]
-    if not authors:
-        authors = [UNKNOWN_AUTHOR]
+    authors = parse_list_field(row.get("authors"), UNKNOWN_AUTHOR)
+    genres = parse_list_field(row.get("genres"), UNKNOWN_GENRE)
 
-    raw_genres = str(row.get("genres", ""))
-    genres = [g.strip() for g in raw_genres.split(",") if g.strip()]
-    if not genres:
-        genres = [UNKNOWN_GENRE]
+    year_val = row.get("year")
+    year = int(year_val) if pd.notna(year_val) else None
 
     books_batch.append(
         {
@@ -49,6 +58,7 @@ for i, (_, row) in enumerate(df.iterrows()):
             "description": str(row.get("description", ""))[:500].strip(),
             "authors": authors,
             "genres": genres,
+            "year": year,
             "embedding": embeddings[i],
         }
     )
@@ -75,9 +85,13 @@ query = """
 uri = config.NEO4J_URI
 auth = (config.NEO4J_USER, config.NEO4J_PASSWORD.get_secret_value())
 
+chunk_size = 500
 with GraphDatabase.driver(uri, auth=auth) as driver:
     with driver.session() as session:
         print("Importing into Neo4j...")
-        session.run(query, batch=books_batch)
+        for start_idx in range(0, len(books_batch), chunk_size):
+            chunk = books_batch[start_idx : start_idx + chunk_size]
+            session.run(query, batch=chunk)
+            print(f"Imported {start_idx + len(chunk)} from {len(books_batch)}...")
 
-print("Done! Books are saved to the graph.")
+print("Ready! Books were successfully imported into Neo4j.")
