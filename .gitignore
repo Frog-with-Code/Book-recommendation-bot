@@ -13,5 +13,7 @@ neo4j_*
 
 .env
 data/
+logs/
+*cache/
 
 .vscode/

@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*cache/
+.git/
+
+.env
+
+.vscode/
+
+*.md
+
+neo4j_data/
+neo4j_logs/
+data/
+logs/
+docs/
