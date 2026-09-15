@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -25,3 +25,5 @@ class BookScore:
 class User:
     id: int
     username: str | None
+    taste_vec: list[float] | None = None
+    liked_genres: list[str] = field(default_factory=list)

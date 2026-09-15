@@ -5,16 +5,22 @@ from .entities import Book, BookScore, User
 
 class UserRepository(ABC):
     @abstractmethod
+    async def get_by_id(self, user_id: int) -> User | None:
+        pass
+
+    @abstractmethod
+    async def get_by_id_lightweight(self, user_id: int) -> User | None:
+        pass
+
+    @abstractmethod
     async def create(
         self,
         user: User,
-        taste_vector: list[float],
-        liked_genres: list[str],
     ) -> None:
         pass
 
     @abstractmethod
-    async def update(self, user: User) -> None:
+    async def update_profile(self, user: User) -> None:
         pass
 
     @abstractmethod
@@ -22,15 +28,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_taste_vector(self, user_id: int) -> list[float] | None:
-        pass
-
-    @abstractmethod
     async def set_taste_vector(self, user_id: int, taste_vec: list[float]) -> None:
-        pass
-
-    @abstractmethod
-    async def get_by_id(self, user_id: int) -> User | None:
         pass
 
     @abstractmethod
@@ -40,12 +38,16 @@ class UserRepository(ABC):
 
 class BookRepository(ABC):
     @abstractmethod
+    async def get_by_id(self, book_id: int) -> Book | None:
+        pass
+
+    @abstractmethod
     async def get_embedding_by_id(self, book_id: int) -> list[float]:
         pass
 
     @abstractmethod
     async def get_recommendations_by_taste(
-        self, user_id: int, taste_vector: list[float] | None, limit: int = 1
+        self, user_id: int, taste_vector: list[float], limit: int = 1
     ) -> list[tuple[Book, BookScore]]:
         pass
 
