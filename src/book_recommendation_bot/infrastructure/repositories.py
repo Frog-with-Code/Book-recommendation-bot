@@ -63,8 +63,6 @@ class Neo4jUserRepository(UserRepository):
     async def create(
         self,
         user: User,
-        taste_vector: list[float],
-        liked_genres: list[str],
     ) -> None:
         query = """
             CREATE (u:User {
@@ -85,8 +83,8 @@ class Neo4jUserRepository(UserRepository):
                     query,
                     user_id=user.id,
                     username=user.username,
-                    taste_vector=taste_vector,
-                    genres=liked_genres,
+                    taste_vector=user.taste_vec,
+                    genres=user.liked_genres,
                 )
             except ConstraintError:
                 raise UniqueConstraintViolationError(f"User '{user.id}' already exists")

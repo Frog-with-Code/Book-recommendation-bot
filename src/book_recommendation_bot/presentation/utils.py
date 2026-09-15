@@ -17,8 +17,8 @@ def format_book_card(book: Book, score: BookScore) -> str:
 
     if book.description:
         desc = book.description.strip()
-        if len(desc) > 400:
-            desc = desc[:397] + "..."
+        if len(desc) > 600:
+            desc = desc[:597] + "..."
         card_parts.append(f"{escape(desc)}\n")
 
     reasons = _build_recommendation_reasons(score)
