@@ -6,7 +6,7 @@ def format_book_card(book: Book, score: BookScore) -> str:
     safe_title = escape(book.title or "Untitled")
     authors = escape(", ".join(book.authors)) if book.authors else "Unknown author"
     genres = escape(", ".join(book.genres)) if book.genres else "Unknown genre"
-    year_str = f"({book.year} г.)" if book.year else "(Unknown year)"
+    year_str = f"{book.year}" if book.year else "Unknown year"
 
     card_parts = [
         f"📖 <b>{safe_title}</b>",
@@ -27,7 +27,7 @@ def format_book_card(book: Book, score: BookScore) -> str:
         card_parts.extend([f"* {reason}" for reason in reasons])
         card_parts.append("")
 
-    card_parts.append("⭐️ <i>Rate book after reading:</i>")
+    card_parts.append("⭐️ <i>Rate book recommendation:</i>")
 
     return "\n".join(card_parts)
 
